@@ -8,5 +8,5 @@ This repository holds some of the presentations that I've given over the years.
   - [slides](https://jasonaxelson.com/talks/elixirconf2022)
   - [video](https://www.youtube.com/watch?v=BotVs6TXR-c)
 - CodeBEAM America 2022 - Nerves in a Cloud World
-  - [slides](https://jasonaxelson.com/talks/elixirconf2022)
+  - [slides](https://jasonaxelson.com/talks/codebeam2022)
   - [git repo](https://github.com/axelson/vps)
