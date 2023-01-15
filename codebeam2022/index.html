@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <title></title>
+    <link rel="stylesheet" href="dist/reveal.css" />
+    <link rel="stylesheet" href="css/jax-black.css" id="theme" />
+    <link rel="stylesheet" href="css/vs2015.css" />
+	<link rel="stylesheet" href="css/layout.css" />
+	<link rel="stylesheet" href="plugin/customcontrols/style.css">
+
+
+
+    <script defer src="dist/fontawesome/all.min.js"></script>
+
+	<script type="text/javascript">
+		var forgetPop = true;
+		function onPopState(event) {
+			if(forgetPop){
+				forgetPop = false;
+			} else {
+				parent.postMessage(event.target.location.href, "app://obsidian.md");
+			}
+        }
+		window.onpopstate = onPopState;
+		window.onmessage = event => {
+			if(event.data == "reload"){
+				window.document.location.reload();
+			}
+			forgetPop = true;
+		}
+
+		function fitElements(){
+			const itemsToFit = document.getElementsByClassName('fitText');
+			for (const item in itemsToFit) {
+				if (Object.hasOwnProperty.call(itemsToFit, item)) {
+					var element = itemsToFit[item];
+					fitElement(element,1, 1000);
+					element.classList.remove('fitText');
+				}
+			}
+		}
+
+		function fitElement(element, start, end){
+
+			let size = (end + start) / 2;
+			element.style.fontSize = `${size}px`;
+
+			if(Math.abs(start - end) < 1){
+				while(element.scrollHeight > element.offsetHeight){
+					size--;
+					element.style.fontSize = `${size}px`;
+				}
+				return;
+			}
+
+			if(element.scrollHeight > element.offsetHeight){
+				fitElement(element, start, size);
+			} else {
+				fitElement(element, size, end);
+			}		
+		}
+
+
+		document.onreadystatechange = () => {
+			fitElements();
+			if (document.readyState === 'complete') {
+				if (window.location.href.indexOf("?export") != -1){
+					parent.postMessage(event.target.location.href, "app://obsidian.md");
+				}
+				if (window.location.href.indexOf("print-pdf") != -1){
+					let stateCheck = setInterval(() => {
+						clearInterval(stateCheck);
+						window.print();
+					}, 250);
+				}
+			}
+	};
+
+
+        </script>
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides"><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 540px; width: 960px; min-height: 540px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+# Nerves in a Cloud World
+
+by Jason Axelson
+
+Code BEAM America 2022
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 540px; width: 960px; min-height: 540px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<div class="" style="position: absolute; left: 0%; top: 0%; height: 20%; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+<div class="block">
+
+# About Me
+</div>
+
+
+</div>
+
+<div class="" style="position: absolute; left: 0%; top: 20%; height: 80%; width: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+<div class="block">
+
+- Developing in Elixir since 2016
+- Occassionally an ElixirLS core contributor
+- Hobbyist Nerves user
+- [@bostonvaulter](https://twitter.com/bostonvaulter)
+</div>
+
+
+</div>
+
+<div class="" style="position: absolute; left: 50%; top: 20%; height: 80%; width: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+<div class="block">
+
+<img src="Attachments/JasonAxelson_Portrait_square.jpg" alt="" style="width: 250px; object-fit: fill">
+
+_professional yak shaver_
+</div>
+
+ <!-- .element: al style="font-size: 26px" -->
+</div>
+
+
+
+
+
+
+
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Nerves in a Cloud World** &nbsp;&nbsp; Jason Axelson ・ Code BEAM America 2022
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 540px; width: 960px; min-height: 540px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<div class="" style="position: absolute; left: 0%; top: 0%; height: 20%; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+<div class="block">
+
+# About Me
+</div>
+
+
+</div>
+
+<div class="" style="position: absolute; left: 0%; top: 20%; height: 80%; width: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+<div class="block">
+
+- Engineering Manager at Felt
+- Maintainer of ExSync, ScenicLiveReload, MainProxy
+</div>
+
+
+</div>
+
+<div class="" style="position: absolute; left: 50%; top: 20%; height: 80%; width: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+<div class="block">
+
+<img src="Attachments/Felt Brand 1.png" alt="" style="width: 300px; object-fit: fill">
+
+We're hiring!
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Nerves in a Cloud World** &nbsp;&nbsp; Jason Axelson ・ Code BEAM America 2022
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 540px; width: 960px; min-height: 540px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### But first a little disclaimer
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Nerves in a Cloud World** &nbsp;&nbsp; Jason Axelson ・ Code BEAM America 2022
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 540px; width: 960px; min-height: 540px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## ⚠️ Warning: Nothing in this talk is meant for production use! ⚠️
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Nerves in a Cloud World** &nbsp;&nbsp; Jason Axelson ・ Code BEAM America 2022
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 540px; width: 960px; min-height: 540px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+# What is Nerves?
+
+- A framework to run Elixir/BEAM on embedded devices
+- Stripped down version of Linux based on buildroot
+- Erlang is the init process
+- Scripts to build and update firmware
+
+<img src="Nerves Logo_Landscape.jpg" alt="" style="object-fit: scale-down">
+
+
+https://www.nerves-project.org
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Nerves in a Cloud World** &nbsp;&nbsp; Jason Axelson ・ Code BEAM America 2022
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 540px; width: 960px; min-height: 540px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Nerves runs on Embedded Hardware
+<img src="RaspberryPi4.png" alt="" style="width: 500px; object-fit: fill">
+
+Pictured: Raspberry Pi 4
+<br>(good luck finding one right now) <!-- .element: style="font-size: 25px" -->
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Nerves in a Cloud World** &nbsp;&nbsp; Jason Axelson ・ Code BEAM America 2022
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 540px; width: 960px; min-height: 540px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Until Now
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Nerves in a Cloud World** &nbsp;&nbsp; Jason Axelson ・ Code BEAM America 2022
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 540px; width: 960px; min-height: 540px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Nerves in the Cloud
+Specifically, the Vultr cloud
+
+<img src="banner_628x628.png" alt="" style="width: 200px; object-fit: fill">
+
+
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Nerves in a Cloud World** &nbsp;&nbsp; Jason Axelson ・ Code BEAM America 2022
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 540px; width: 960px; min-height: 540px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## My Nerves Cloud
+
+- I've been running nerves in the cloud for over a year 🎉
+- Nerves powers these sites:
+	- https://depviz.jasonaxelson.com
+	- https://makeuplive.jasonaxelson.com
+	- https://sketch.jasonaxelson.com
+		- (original code by [@chris_mccord](https://twitter.com/chris_mccord))
+	- https://jamroom.jasonaxelson.com
+		- (original code by [@HassanShaikley](https://twitter.com/HassanShaikley))
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Nerves in a Cloud World** &nbsp;&nbsp; Jason Axelson ・ Code BEAM America 2022
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 540px; width: 960px; min-height: 540px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+# But why?
+
+- &shy;<!-- .element: class="fragment" data-fragment-index="1" -->Minimal deployment environment
+- &shy;<!-- .element: class="fragment" data-fragment-index="2" -->Economical - Run multiple Phoenix apps
+- &shy;<!-- .element: class="fragment" data-fragment-index="3" -->`Nerves.Runtime.revert/0`
+- &shy;<!-- .element: class="fragment" data-fragment-index="4" -->Easy backups
+- &shy;<!-- .element: class="fragment" data-fragment-index="5" -->Skip a lot of deployment steps
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Nerves in a Cloud World** &nbsp;&nbsp; Jason Axelson ・ Code BEAM America 2022
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 540px; width: 960px; min-height: 540px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+# But why?
+
+Example steps that you can skip:
+- Add your SSH key to metadata in Compute Engine
+- Enable swap memory on the instance
+- Install Erlang, Elixir, Node
+- Install Nginx + Certbot
+- Create systemd services to ensure your app starts up
+
+<br>
+<div class="block">
+
+Example steps from [Damon Janis' blog post](https://damonvjanis.medium.com/optimizing-for-free-hosting-elixir-deployments-6bfc119a1f44) 
+</div>
+
+ <!-- .element: style="font-size: 25px" -->
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Nerves in a Cloud World** &nbsp;&nbsp; Jason Axelson ・ Code BEAM America 2022
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 540px; width: 960px; min-height: 540px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+# But why?
+
+- &shy;<!-- .element: class="fragment" data-fragment-index="1" -->For fun!
+- &shy;<!-- .element: class="fragment" data-fragment-index="2" -->Pushes Elixir/BEAM boundaries
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Nerves in a Cloud World** &nbsp;&nbsp; Jason Axelson ・ Code BEAM America 2022
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 540px; width: 960px; min-height: 540px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## How does it work?
+- `nerves_system_vultr` allows nerves to run on a Vultr VM
+- `main_proxy` enables multiple Phoenix apps in one BEAM instance
+- `site_encrypt` handles SSL with Let's Encrypt
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Nerves in a Cloud World** &nbsp;&nbsp; Jason Axelson ・ Code BEAM America 2022
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 540px; width: 960px; min-height: 540px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Limitations
+- System reboots after a deploy
+- Less common path
+- More work for nifs
+- Possible boot loops
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Nerves in a Cloud World** &nbsp;&nbsp; Jason Axelson ・ Code BEAM America 2022
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 540px; width: 960px; min-height: 540px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## How does traffic get served?
+
+<img src="Excalidraw/CodeBEAM America 2022 Slides 2022-10-08 11.50.13.excalidraw.svg" alt="" style="object-fit: scale-down">
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 540px; width: 960px; min-height: 540px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Traffic Details
+
+<img src="Excalidraw/CodeBEAM America 2022 Slides 2022-10-16 22.04.44.excalidraw.svg" alt="" style="object-fit: scale-down">
+
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Nerves in a Cloud World** &nbsp;&nbsp; Jason Axelson ・ Code BEAM America 2022
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 540px; width: 960px; min-height: 540px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Project Setup
+
+<img src="Excalidraw/CodeBEAM America 2022 Slides 2022-10-24 08.29.11.excalidraw.svg" alt="" style="object-fit: scale-down">
+
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Nerves in a Cloud World** &nbsp;&nbsp; Jason Axelson ・ Code BEAM America 2022
+
+</div>
+</div></script></section><section ><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 540px; width: 960px; min-height: 540px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## How do I run this at home?
+
+- Define a proxy module with `use MainProxy.Proxy`
+	- Start it in your application tree
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Nerves in a Cloud World** &nbsp;&nbsp; Jason Axelson ・ Code BEAM America 2022
+
+</div>
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 540px; width: 960px; min-height: 540px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+```elixir [|2|4-7|9-15]
+defmodule VpsWeb.MyProxy do
+  use MainProxy.Proxy
+
+  @impl MainProxy.Proxy
+  def backends do
+     # ... backends configuration
+  end
+
+  # Needed for SiteEncrypt
+  @impl MainProxy.Proxy
+  def merge_config(:https, opts) do
+    Config.Reader.merge(opts, SiteEncrypt.https_keys(VpsWeb.Endpoint))
+  end
+
+  def merge_config(_, opts), do: opts
+end
+```
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Nerves in a Cloud World** &nbsp;&nbsp; Jason Axelson ・ Code BEAM America 2022
+
+</div>
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 540px; width: 960px; min-height: 540px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+```elixir [|2-5|7-11|12]
+def backends do
+  site_configurations = Application.fetch_env!(:vps, :endpoint_configs)
+    |> Enum.map(fn {_app, endpoint, hostname} ->
+      %{domain: hostname, phoenix_endpoint: endpoint}
+    end)
+
+  site_encrypt_path = ~r/^\/.well-known\/acme-challenge\//
+
+  List.flatten([
+    # Needed for site_encrypt
+    %{path: site_encrypt_path, phoenix_endpoint: VpsWeb.Endpoint},
+    site_configurations
+  ])
+end
+```
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Nerves in a Cloud World** &nbsp;&nbsp; Jason Axelson ・ Code BEAM America 2022
+
+</div>
+</div></script></section></section><section ><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 540px; width: 960px; min-height: 540px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## What about secrets?
+- Goal: Keep secrets out of the git repository
+- `Vps.RuntimeConfigProvider` to load
+	- `/data/.target.secret.exs`
+	- `.target.secret.exs` is loaded via `scp`
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Nerves in a Cloud World** &nbsp;&nbsp; Jason Axelson ・ Code BEAM America 2022
+
+</div>
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 540px; width: 960px; min-height: 540px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+```elixir [|7-9]
+defmodule Vps.RuntimeConfigProvider do
+  @behaviour Config.Provider
+
+  def init(path) when is_binary(path), do: path
+
+  def load(config, path) do
+    if File.exists?(path) do
+      Config.Reader.load(config, {path, []})
+    else
+      IO.puts("WARNING: Unable to load runtime config at #{inspect(path)}")
+      config
+    end
+  rescue
+    err ->
+      IO.puts("WARNING: Unable to load runtime config: #{inspect(err)}")
+      config
+  end
+end
+```
+</div></script></section></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 540px; width: 960px; min-height: 540px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Viewing Logs
+- `ssh vultr`
+- `RingLogger.next`
+
+```
+16:23:59.376 [debug] MainProxy.Cowboy2Handler called with req: %{bindings: %{}, body_length: 0, cert: :undefined, has_body: false, headers: %{"accept" => "*/*", "accept-encoding" => "gzip, deflate", "cache-control" => "no-cache", "connection" => "Keep-Alive", "from" => "bingbot(at)microsoft.com", "host" => "makeuplive.jasonaxelson.com", "pragma" => "no-cache", "user-agent" => "Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)"}, host: "makeuplive.jasonaxelson.com", host_info: :undefined, method: "GET", path: "/", path_info: :undefined, peer: {{0, 0, 0, 0, 0, 65535, 53038, 3404}, 26112}, pid: #PID<0.3023.0>, port: 80, qs: "", ref: HTTP, scheme: "http", sock: {{0, 0, 0, 0, 0, 65535, 11596, 19228}, 80}, streamid: 1, version: :"HTTP/1.1"}
+
+16:23:59.376 [debug] Backend chosen: %{domain: "makeuplive.jasonaxelson.com", phoenix_endpoint: MakeupLiveWeb.Endpoint}
+
+16:23:59.376 [info] Plug.SSL is redirecting GET / to https://makeuplive.jasonaxelson.com with status 301
+
+16:23:59.377 [debug] QUERY OK db=0.6ms idle=950.4ms
+INSERT INTO "hits" ("duration","plug","inserted_at") VALUES (?,?,?) RETURNING "id" [0, "MakeupLiveWeb.Endpoint", "2022-10-30T16:23:59"]
+```
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Nerves in a Cloud World** &nbsp;&nbsp; Jason Axelson ・ Code BEAM America 2022
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 540px; width: 960px; min-height: 540px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Is it easy to deploy?
+yes
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Nerves in a Cloud World** &nbsp;&nbsp; Jason Axelson ・ Code BEAM America 2022
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 540px; width: 960px; min-height: 540px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Typical Nerves deployment
+
+<img src="Excalidraw/CodeBEAM America 2022 Slides 2022-10-08 11.43.22.excalidraw.svg" alt="" style="object-fit: scale-down">
+
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Nerves in a Cloud World** &nbsp;&nbsp; Jason Axelson ・ Code BEAM America 2022
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 540px; width: 960px; min-height: 540px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Nerves deployment in the Cloud
+
+<img src="Excalidraw/CodeBEAM America 2022 Slides 2022-10-08 11.49.41.excalidraw.svg" alt="" style="object-fit: scale-down">
+
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Nerves in a Cloud World** &nbsp;&nbsp; Jason Axelson ・ Code BEAM America 2022
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 540px; width: 960px; min-height: 540px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Example deploy
+
+<video data-autoplay controls><source src="VPS_Deploy2.mp4" type="video/mp4"></video>
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Nerves in a Cloud World** &nbsp;&nbsp; Jason Axelson ・ Code BEAM America 2022
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 540px; width: 960px; min-height: 540px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Future Work
+- Try other clouds
+- Try deploying via NervesHub
+- Write a blog post
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Nerves in a Cloud World** &nbsp;&nbsp; Jason Axelson ・ Code BEAM America 2022
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 540px; width: 960px; min-height: 540px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Conclusion
+- Running Nerves in the cloud is fun!
+- You too can operate your own Nerves Cloud
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Nerves in a Cloud World** &nbsp;&nbsp; Jason Axelson ・ Code BEAM America 2022
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 540px; width: 960px; min-height: 540px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## 💜 Nerves Core Team!
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Nerves in a Cloud World** &nbsp;&nbsp; Jason Axelson ・ Code BEAM America 2022
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 540px; width: 960px; min-height: 540px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Thank you
+
+- &shy;<!-- .element: class="fragment" data-fragment-index="1" -->Questions?
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Nerves in a Cloud World** &nbsp;&nbsp; Jason Axelson ・ Code BEAM America 2022
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" data-visibility="uncounted" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 540px; width: 960px; min-height: 540px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Resources
+- https://jasonaxelson.com/talks/codebeam2022
+- https://github.com/axelson/vps
+- https://github.com/fhunleth/fhunleth-buildroot-experiments/tree/master/board/nerves_vultr_loader
+- https://github.com/Main-Proxy/main_proxy
+</div></script></section></div>
+    </div>
+
+    <script src="dist/reveal.js"></script>
+
+    <script src="plugin/markdown/markdown.js"></script>
+    <script src="plugin/highlight/highlight.js"></script>
+    <script src="plugin/zoom/zoom.js"></script>
+    <script src="plugin/notes/notes.js"></script>
+    <script src="plugin/math/math.js"></script>
+	<script src="plugin/mermaid/mermaid.js"></script>
+	<script src="plugin/chart/chart.min.js"></script>
+	<script src="plugin/chart/plugin.js"></script>
+	<script src="plugin/customcontrols/plugin.js"></script>
+
+    <script>
+      function extend() {
+        var target = {};
+        for (var i = 0; i < arguments.length; i++) {
+          var source = arguments[i];
+          for (var key in source) {
+            if (source.hasOwnProperty(key)) {
+              target[key] = source[key];
+            }
+          }
+        }
+        return target;
+      }
+
+	  function isLight(color) {
+		let hex = color.replace('#', '');
+
+		// convert #fff => #ffffff
+		if(hex.length == 3){
+			hex = `${hex[0]}${hex[0]}${hex[1]}${hex[1]}${hex[2]}${hex[2]}`;
+		}
+
+		const c_r = parseInt(hex.substr(0, 2), 16);
+		const c_g = parseInt(hex.substr(2, 2), 16);
+		const c_b = parseInt(hex.substr(4, 2), 16);
+		const brightness = ((c_r * 299) + (c_g * 587) + (c_b * 114)) / 1000;
+		return brightness > 155;
+	}
+
+	var bgColor = getComputedStyle(document.documentElement).getPropertyValue('--r-background-color').trim();
+	var isLight = isLight(bgColor);
+
+	if(isLight){
+		document.body.classList.add('has-light-background');
+	} else {
+		document.body.classList.add('has-dark-background');
+	}
+
+      // default options to init reveal.js
+      var defaultOptions = {
+        controls: true,
+        progress: true,
+        history: true,
+        center: true,
+        transition: 'default', // none/fade/slide/convex/concave/zoom
+        plugins: [
+          RevealMarkdown,
+          RevealHighlight,
+          RevealZoom,
+          RevealNotes,
+          RevealMath.MathJax3,
+		  RevealMermaid,
+		  RevealChart,
+		  RevealCustomControls,
+        ],
+
+
+    	allottedTime: 120 * 1000,
+
+		mathjax3: {
+			mathjax: 'plugin/math/mathjax/tex-mml-chtml.js',
+		},
+		markdown: {
+		  gfm: true,
+		  mangle: true,
+		  pedantic: false,
+		  smartLists: false,
+		  smartypants: false,
+		},
+
+		mermaid: {
+			theme: isLight ? 'default' : 'dark',
+		},
+
+		customcontrols: {
+			controls: [
+			]
+		},
+      };
+
+      // options from URL query string
+      var queryOptions = Reveal().getQueryHash() || {};
+
+      var options = extend(defaultOptions, {"width":960,"height":540,"margin":0.15,"controls":true,"progress":true,"slideNumber":"all","transition":"slide","transitionSpeed":"default"}, queryOptions);
+    </script>
+
+    <script>
+      Reveal.initialize(options);
+    </script>
+  </body>
+
+  <!-- created with Advanced Slides -->
+</html>
