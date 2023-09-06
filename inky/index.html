@@ -1,0 +1,1514 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <title></title>
+    <link rel="stylesheet" href="dist/reveal.css" />
+    <link rel="stylesheet" href="css/jax-black.css" id="theme" />
+    <link rel="stylesheet" href="css/vs2015.css" />
+	<link rel="stylesheet" href="css/layout.css" />
+	<link rel="stylesheet" href="plugin/customcontrols/style.css">
+
+
+
+    <script defer src="dist/fontawesome/all.min.js"></script>
+
+	<script type="text/javascript">
+		var forgetPop = true;
+		function onPopState(event) {
+			if(forgetPop){
+				forgetPop = false;
+			} else {
+				parent.postMessage(event.target.location.href, "app://obsidian.md");
+			}
+        }
+		window.onpopstate = onPopState;
+		window.onmessage = event => {
+			if(event.data == "reload"){
+				window.document.location.reload();
+			}
+			forgetPop = true;
+		}
+
+		function fitElements(){
+			const itemsToFit = document.getElementsByClassName('fitText');
+			for (const item in itemsToFit) {
+				if (Object.hasOwnProperty.call(itemsToFit, item)) {
+					var element = itemsToFit[item];
+					fitElement(element,1, 1000);
+					element.classList.remove('fitText');
+				}
+			}
+		}
+
+		function fitElement(element, start, end){
+
+			let size = (end + start) / 2;
+			element.style.fontSize = `${size}px`;
+
+			if(Math.abs(start - end) < 1){
+				while(element.scrollHeight > element.offsetHeight){
+					size--;
+					element.style.fontSize = `${size}px`;
+				}
+				return;
+			}
+
+			if(element.scrollHeight > element.offsetHeight){
+				fitElement(element, start, size);
+			} else {
+				fitElement(element, size, end);
+			}		
+		}
+
+
+		document.onreadystatechange = () => {
+			fitElements();
+			if (document.readyState === 'complete') {
+				if (window.location.href.indexOf("?export") != -1){
+					parent.postMessage(event.target.location.href, "app://obsidian.md");
+				}
+				if (window.location.href.indexOf("print-pdf") != -1){
+					let stateCheck = setInterval(() => {
+						clearInterval(stateCheck);
+						window.print();
+					}, 250);
+				}
+			}
+	};
+
+
+        </script>
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides"><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Drawing to 7-color e-ink screens with Scenic and Nerves
+
+by Jason Axelson
+
+ElixirConf US 2023
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" data-auto-animate="true" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<div class="" style="position: absolute; left: 0%; top: 0%; height: 20%; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+<div class="block">
+
+## About Me
+</div>
+
+
+</div>
+
+<div class="" style="position: absolute; left: 0%; top: 20%; height: 80%; width: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+<div class="block">
+
+- Developing in Elixir since 2016
+- Hobbyist Nerves user
+- [@axelson@fosstodon.org](https://fosstodon.org/@axelson)
+</div>
+
+
+</div>
+
+<div class="" style="position: absolute; left: 50%; top: 20%; height: 80%; width: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+<div class="block">
+
+<img src="Attachments/JasonAxelson_Portrait_square.jpg" alt="" style="width: 250px; object-fit: fill">
+
+<!-- .element: al style="margin-bottom: -10px; max-width: 250px" -->
+_professional yak shaver_
+</div>
+
+ <!-- .element: al style="font-size: 26px" -->
+</div>
+
+
+
+
+
+
+
+
+
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" data-auto-animate="true" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<div class="" style="position: absolute; left: 0%; top: 0%; height: 20%; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+<div class="block">
+
+## About Me
+</div>
+
+
+</div>
+
+<div class="" style="position: absolute; left: 0%; top: 20%; height: 80%; width: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+<div class="block">
+
+- Engineering Manager at Felt
+- Maintainer of Scenic, Inky, ExSync, ScenicLiveReload, MainProxy
+</div>
+
+
+</div>
+
+<div class="" style="position: absolute; left: 50%; top: 20%; height: 80%; width: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+<div class="block">
+
+<img src="Attachments/Felt Brand 1.png" alt="" style="width: 300px; object-fit: fill">
+
+<!-- .element: al style="margin-bottom: -10px; max-width: 300px" -->
+_We're building the best way to<br>
+make maps 🗺️ on the Internet!_
+</div>
+
+<!-- .element: al style="font-size: 26px" -->
+</div>
+
+
+
+
+
+
+
+
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" template="" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Where are we going?
+<img src="Attachments/2023-08-27 10.06.44 Inky Impression Dash glamor shot.jpg" alt="" style="object-fit: scale-down">
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Why I love e-ink
+<img src="Attachments/ElixirConf 2023 e-ink talk e-ink vs paper vs LCD.excalidraw.svg" alt="" style="object-fit: scale-down">
+
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Why I love e-ink
+<img src="Attachments/Pasted image 20230830205958.png" alt="" style="object-fit: scale-down">
+
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" template="" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## I may have a problem
+<img src="Attachments/2023-09-02 my e-ink devices.jpg" alt="" style="width: 750px; object-fit: fill">
+
+plz send help
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Why I love e-ink
+- Low power
+- Less eye strain
+- More paper-like
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+# But first, some definitions
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## So, what is e-ink?
+- e-ink is a display technology that draws with pigments
+- Often encountered in e-readers (e.g. kindle or kobo)
+- uses microcapsules to display black/white "pixels"
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section ><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## How does e-ink work?
+<img src="Attachments/e-ink black-white without charge diagram.excalidraw.svg" alt="" style="object-fit: scale-down">
+
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## How does e-ink work?
+
+<img src="Attachments/e-ink black-white with charge diagram.excalidraw.svg" alt="" style="object-fit: scale-down">
+
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section></section><section ><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+# Wait, I thought you have multiple-colors
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## ACeP - Advanced Color ePaper
+- Now add more more particles of different sizes into the mix
+- The larger colored particles move slower
+	- Particles have different densities, size, speed, electrical sensitivity
+- Rapidly changing the charges allows you to choose the order of the particles
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## How does multi-color e-ink work?
+
+<img src="Attachments/How e-ink works multi-color 1.excalidraw.svg" alt="" style="object-fit: scale-down">
+
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## How does multi-color e-ink work?
+<img src="Attachments/How e-ink works multi-color 2.excalidraw.svg" alt="" style="object-fit: scale-down">
+
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## How does multi-color e-ink work?
+<img src="Attachments/How e-ink works multi-color 3.excalidraw.svg" alt="" style="object-fit: scale-down">
+
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Inky Impression downsides
+- SLOOWWW refresh
+- This was a major constraint on my project
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Demo time!
+<video data-autoplay controls><source src="Attachments/inky-impression-refresh.mp4" type="video/mp4"></video>
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Fun e-ink facts
+- Multi-color e-ink is temperature dependent
+- There's a temperature sensor on the board
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## What is Nerves?
+- A framework to run Elixir/BEAM on embedded devices
+- Stripped down version of Linux based on buildroot
+- Erlang is the init process
+- Scripts to build and update firmware
+
+<img src="Attachments/Nerves Logo_Landscape.jpg" alt="" style="object-fit: scale-down">
+
+
+[nerves-project.org](https://www.nerves-project.org)
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<div class="" style="position: absolute; left: 0%; top: 0%; height: 20%; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+<div class="block">
+
+## What is Scenic?
+</div>
+
+
+</div>
+
+<div class="" style="position: absolute; left: 0%; top: 20%; height: 80%; width: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+<div class="block">
+
+<img src="Attachments/scenic_parrot.png" alt="" style="width: 200px; object-fit: fill">
+
+(scenic logo)
+</div>
+
+
+</div>
+
+<div class="" style="position: absolute; left: 50%; top: 20%; height: 80%; width: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+<div class="block">
+
+- Scenic is a graphics library for elixir
+- Targeted at embedded devices
+- Created by Kry10 for Kry10 OS
+
+<img src="Attachments/kry10-logo-white2.png" alt="" style="object-fit: scale-down">
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Why use Scenic?
+- No web browser in sight!
+- Great control over the rendering
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## What is Inky?
+- Hobbyist e-ink screen
+- Built by Pimoroni (based in the UK)
+
+<br><br>
+<img src="Attachments/Pimoroni logo.png" alt="" style="object-fit: scale-down">
+
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Types of Inky displays
+<img src="Attachments/ElixirConf 2023 e-ink talk inkys overview.jpg" alt="" style="object-fit: scale-down">
+
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Inky Impression 7.3"
+<img src="Attachments/ElixirConf 2023 e-ink talk impression 7_3_new.excalidraw.svg" alt="" style="object-fit: scale-down">
+
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## My Inky journey
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" template="" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## My Inky Journey
+<img src="Attachments/ElixirConf 2023 e-ink talk Inky Journey 1.excalidraw.svg" alt="" style="object-fit: scale-down">
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## My Inky Journey
+<img src="Attachments/inky_first_cropped.jpg" alt="" style="object-fit: scale-down">
+
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## My Inky Journey
+<img src="Attachments/inky_first_display.jpg" alt="" style="object-fit: scale-down">
+
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" template="" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## My Inky Journey
+<img src="Attachments/ElixirConf 2023 e-ink talk Inky Journey 2.excalidraw.svg" alt="" style="object-fit: scale-down">
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Inky Impression 7.3" challenges
+- new chip
+- framebuffer issues
+- ugly text
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## uh-oh!
+<img src="Attachments/2023-09-02 inky scrambled.jpg" alt="" style="width: 650px; object-fit: fill">
+
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### The framebuffer is TOO SMALL
+<img src="Attachments/ElixirConf 2023 e-ink talk missing 80 x 480.excalidraw.svg" alt="" style="object-fit: scale-down">
+
+- The default framebuffer is 720 x 480
+- The Inky Impression 7.3" is 800 x 480
+- 80 x 480 pixels are not addressable!
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## How does the Inky library work?
+<img src="Attachments/ElixirConf 2023 e-ink talk Inky Architecture.excalidraw.svg" alt="" style="object-fit: scale-down">
+
+- `scenic_driver_inky` uses `rpi_fb_capture` to read the RPi's framebuffer into an rgb24 image
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Solving the 80 x 480 pixels
+The RPi docs say that `framebuffer_width` and `framebuffer_height` control the width and height of the framebuffer
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## The RPi docs lie
+`framebuffer_width` and `framebuffer_height` do nothing
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Breakthrough
+- Let's try a more powerful Pi
+- Using an RPi3 gives a nice big framebuffer!
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Crash
+- &shy;<!-- .element: class="fragment" data-fragment-index="1" -->What changed?
+- &shy;<!-- .element: class="fragment" data-fragment-index="2" -->I was using an HDMI monitor for debugging
+- &shy;<!-- .element: class="fragment" data-fragment-index="3" -->The HDMI changed the size of the framebuffer
+- &shy;<!-- .element: class="fragment" data-fragment-index="4" -->Hmm 🤔🤔🤔
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## The Solution
+> Setting `hdmi_edid_file` to `1` will cause the GPU to read EDID data from the `edid.dat` file, located in the boot partition, instead of reading it from the monitor.
+
+- Set `hdmi_edid_file=1` tell the Pi that an HDMI monitor is attached
+
+https://www.raspberrypi.com/documentation/computers/config_txt.html
+<!-- .element: al style="font-size: 20px" -->
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Our Goal
+- In `config.txt` set `hdmi_edid_file=1` to tell the Pi to load `/boot/edid.dat`
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## The Solution
+- Wait, how do we set `config.txt`?
+- Time to dig into `fwup`!
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Relevant files
+<img src="Attachments/ElixirConf 2023 e-ink talk fwup config_txt.excalidraw.svg" alt="" style="width: 700px; object-fit: fill">
+
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## The Solution
+- Copy the initial `fwup.conf` from the Nerves System (e.g. `nerves_system_rpi0`)
+	- `cp deps/nerves_system_rpi0/fwup.conf config/rpi0/fwup.conf`
+- Do the same for `config.txt`
+	- `cp deps/nerves_system_rpi0/config.txt config/rpi0/config.txt`
+- Use our custom `fwup.conf` in your Elixir configuration:
+	- `config :nerves, :firmware, fwup_conf: "config/rpi0/fwup.conf"`
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## The Solution
+Customize `config.txt` to add `hdmi_edid_file=1`:
+```text
+...
+# Use an edid.dat file to force the frame buffer to be larger than the default 720 x 480
+# which is too small to adaquately drive the Inky Impression 7.3"
+hdmi_edid_file=1
+```
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## The Solution
+Customize `fwup.conf` to point to your custom `config.txt`
+```
+file-resource config.txt {
+-    host-path = "${NERVES_SYSTEM}/images/config.txt"
++    host-path = "${NERVES_APP}/config/rpi0/config.txt"
+}
+```
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## The Solution
+- Now we can add `edid.dat` to `/boot/`!
+- &shy;<!-- .element: class="fragment" data-fragment-index="1" -->Let's use `rootfs_overlay`
+- &shy;<!-- .element: class="fragment" data-fragment-index="2" -->Wait `rootfs_overlay` can add files anywhere _except_ `/boot/`!!
+	- &shy;<!-- .element: class="fragment" data-fragment-index="3" --><img src="Attachments/Screen Shot 2023-09-04 at 9.45.35 PM.png">
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## The Solution
+- Back to `fwup.conf`!
+- Our new goal: Tell `fwup.conf` to add the `edid.dat` to `/boot/`
+- First step: declare a new file resource
+```
+file-resource edid.dat {
+    host-path = "${NERVES_APP}/config/rpi0/edid.dat"
+}
+```
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## The Solution
+```
+task complete {
+...
++   on-resource edid.dat { fat_write(${BOOT_A_PART_OFFSET}, "edid.dat") }
+...
+}
+```
+&nbsp;
+- Do the same for `task upgrade.a` and `task upgrade.b`
+- This copies that file to `/boot` when the firmware is built
+- Great, let's try it!
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## The Result
+<img src="Attachments/ElixirConf 2023 e-ink talk 80 x 480 fix.excalidraw.svg" alt="" style="object-fit: scale-down">
+
+Mission complete! 🎉
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" template="" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## My Inky Journey
+<img src="Attachments/ElixirConf 2023 e-ink talk Inky Journey 3.excalidraw.svg" alt="" style="object-fit: scale-down">
+</div></script></section><section ><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## My Dash Display
+<img src="Attachments/2023-08-27 10.06.44 Inky Impression Dash glamor shot.jpg" alt="" style="width: 900px; object-fit: fill">
+
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## My Dash Display
+<img src="Attachments/ElixirConf 2023 e-ink talk glamour co-workers.excalidraw.svg" alt="" style="width: 900px; object-fit: fill">
+
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## My Dash Display
+<img src="Attachments/ElixirConf 2023 e-ink talk (Project) 2023-09-04 14.26.39.excalidraw.svg" alt="" style="width: 900px; object-fit: fill">
+
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## My Dash Display
+<img src="Attachments/ElixirConf 2023 e-ink talk glamour calendar and time.excalidraw.svg" alt="" style="width: 900px; object-fit: fill">
+
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## My Dash Display
+<img src="Attachments/ElixirConf 2023 e-ink talk glamour shot pomodoro viz.excalidraw.svg" alt="" style="width: 900px; object-fit: fill">
+
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Rpi0 + Nerves Powered
+<img src="Attachments/2023-08-31 inky impression 7_3 back.jpg" alt="" style="object-fit: scale-down">
+
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## The stand
+<img src="Attachments/2023-08-31 Inky Impression Stand detail.jpg" alt="" style="object-fit: scale-down">
+
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## The pieces
+<img src="Attachments/ElixirConf 2023 e-ink talk (Project) Pieces.excalidraw.svg" alt="" style="object-fit: scale-down">
+
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Co-workers
+<img src="Attachments/ElixirConf 2023 e-ink talk Co-worker row.excalidraw.svg" alt="" style="object-fit: scale-down">
+
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" template="" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Quotes
+<img src="Attachments/Pasted image 20230831181143.png" alt="" style="object-fit: scale-down">
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Pomodoro Viz
+<img src="Attachments/ElixirConf 2023 e-ink talk Pomodoro Viz.excalidraw.svg" alt="" style="object-fit: scale-down">
+
+- I definitely haven't been sticking to 30/5 pomodoro's!
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Network Architecture
+<img src="Attachments/Impression Dash architecture.excalidraw.svg" alt="" style="width: 750px; object-fit: fill">
+
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Process architecture
+<img src="Attachments/Impression Dash processes.excalidraw.svg" alt="" style="width: 800px; object-fit: fill">
+
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Getting the data
+- Quantum is used as orchestration
+
+```elixir
+config :dash, Dash.QuantumScheduler,
+  timezone: "Pacific/Honolulu",
+  jobs: [
+    {"29,59 5-22 * * *", {Dash.Weather.Server, :update_weather, []}},
+    {"*/1 * * * *", {Dash.PomodoroServer, :refresh, []}},
+    {"*/30 5-22 * * *", {Dash.Scene.Home, :refresh, []}},
+    {"0 4 * * *", {Dash.Scene.Home, :switch_quotes, []}}
+  ]
+  ```
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## E-ink challenge
+- Ugly font rendering
+
+<img src="Attachments/impression_5-7_3.jpg" alt="" style="object-fit: scale-down">
+
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Let's talk about making it beautiful
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Sub-pixel hinting
+<img src="Attachments/ElixirConf 2023 e-ink talk (Project) 2023-08-31 18.15.36.excalidraw.svg" alt="" style="width: 600px; object-fit: fill">
+
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" template="" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Use a pixel font
+<img src="Attachments/2023-03-25 inky fonts.jpg" alt="" style="object-fit: scale-down">
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Use a Pixel font
+<img src="Attachments/ElixirConf 2023 e-ink talk pixel.excalidraw.svg" alt="" style="object-fit: scale-down">
+
+- Avoids sub-pixel hinting issues
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+# Using Scenic
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Rendering with Scenic
+<img src="Attachments/ElixirConf 2023 e-ink talk (Project) 2023-09-03 20.21.56.excalidraw.svg" alt="" style="width: 800px; object-fit: fill">
+
+Absolute layouts everywhere
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Rendering Pomodoros with Scenic
+<img src="Attachments/ElixirConf 2023 e-ink talk Pomodoro Viz.excalidraw.svg" alt="" style="object-fit: scale-down">
+
+
+<img src="Attachments/single_pomodoro.png" alt="" style="width: 300px; object-fit: fill">
+
+Single pomodoro
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" data-auto-animate="true" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Rendering Pomodoros with Scenic
+```elixir [|2-4|6-8]
+def initialize_graph(pomodoros) do
+  graph =
+    Scenic.Graph.build()
+    |> rect({@width, 1}, fill: :black, t: {0, 10})
+
+  scale = Dash.Scale.new_continuous(domain: {6, 18}, range: {0, @width})
+  scale_fn = Contex.Scale.domain_to_range_fn(scale)
+  now = DateTime.now!("Pacific/Honolulu")
+
+  Enum.reduce(pomodoros, graph, fn pomodoro, graph ->
+    # ...
+  end)
+end
+```
+Scales from [github.com/mindok/contex](https://github.com/mindok/contex)
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" data-auto-animate="true" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Rendering Pomodoros with Scenic
+```elixir [4-12|13-16]
+def initialize_graph(pomodoros) do
+  # ...
+
+  Enum.reduce(pomodoros, graph, fn pomodoro, graph ->
+    graph
+    # work-time rectangle
+    |> draw_rect(pomodoro.started_at, pomodoro.finished_at, scale_fn, :red)
+    # limbo-time rectangle
+    |> draw_rect(pomodoro.finished_at, pomodoro.rest_started_at, scale_fn, :orange)
+    # rest-time rectangle
+    |> draw_rect(pomodoro.rest_started_at, pomodoro.rest_finished_at, scale_fn, :blue)
+  end)
+  # 12 noon mark
+  |> rect({2, 10}, fill: :black, t: {scale_fn.(12), 10})
+  # current time
+  |> rect({2, 10}, fill: :red, t: {scale_fn.(hour_min(now)), 10})
+end
+```
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" data-auto-animate="true" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Rendering Pomodoros with Scenic
+```elixir []
+def draw_rect(graph, start_time, finish_time, scale_fn, fill) do
+  if start_time && finish_time do
+    start_x = scale_fn.(hour_min(start_time))
+    finish_x = scale_fn.(hour_min(finish_time))
+    width = finish_x - start_x
+    rect(graph, {width, 10}, t: {start_x, 0}, fill: fill)
+  else
+    graph
+  end
+end
+
+def hour_min(%DateTime{} = time) do
+  time.hour + time.minute / 60
+end
+```
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Scenic + Nerves + e-ink Tips
+- Use an RPi3 instead of RPi0
+	- Deploy and reboot ~3x faster
+- Use HDMI when developing
+- Develop primarily in host mode
+	- checkout [github.com/axelson/scenic_live_reload](https://github.com/axelson/scenic_live_reload/)
+- Checkout [github.com/scenic-contrib](https://github.com/scenic-contrib)
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## I 💜 my e-ink dash
+- I enjoy having it on my desk
+- You could have one too!
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+# Thank You!
+
+[github.com/axelson/talks](https://github.com/axelson/talks)
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section ><section data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+# Questions?
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" data-visibility="uncounted" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Colophon
+- Built in [Obsidian](https://obsidian.md/) with the [Advanced Slides](https://github.com/MSzturc/obsidian-advanced-slides) plugin
+- Uses [reveal.js](https://revealjs.com/) for the slides
+- Diagrams were made with [Excalidraw](https://excalidraw.com/) (via the excellent [Obsidian Excalidraw plugin](https://github.com/zsviczian/obsidian-excalidraw-plugin))
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section><section data-markdown><script type="text/template"><!-- .slide: class="drop" data-visibility="uncounted" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 720px; width: 1280px; min-height: 720px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+## Loading
+<img src="Attachments/Screen Shot 2023-09-04 at 9.45.35 PM.png" alt="" style="object-fit: scale-down">
+
+
+<div class="" style="font-size: 14px; margin-top: 4%; position: absolute; left: 1%; top: 98%; height: 2%; width: 98%; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-evenly" align="left">
+
+
+**Drawing to a 7-color e-ink screens with Scenic and Nerves** &nbsp;&nbsp; Jason Axelson ・ ElixirConf US 2023
+
+</div>
+</div></script></section></section></div>
+    </div>
+
+    <script src="dist/reveal.js"></script>
+
+    <script src="plugin/markdown/markdown.js"></script>
+    <script src="plugin/highlight/highlight.js"></script>
+    <script src="plugin/zoom/zoom.js"></script>
+    <script src="plugin/notes/notes.js"></script>
+    <script src="plugin/math/math.js"></script>
+	<script src="plugin/mermaid/mermaid.js"></script>
+	<script src="plugin/chart/chart.min.js"></script>
+	<script src="plugin/chart/plugin.js"></script>
+	<script src="plugin/customcontrols/plugin.js"></script>
+
+    <script>
+      function extend() {
+        var target = {};
+        for (var i = 0; i < arguments.length; i++) {
+          var source = arguments[i];
+          for (var key in source) {
+            if (source.hasOwnProperty(key)) {
+              target[key] = source[key];
+            }
+          }
+        }
+        return target;
+      }
+
+	  function isLight(color) {
+		let hex = color.replace('#', '');
+
+		// convert #fff => #ffffff
+		if(hex.length == 3){
+			hex = `${hex[0]}${hex[0]}${hex[1]}${hex[1]}${hex[2]}${hex[2]}`;
+		}
+
+		const c_r = parseInt(hex.substr(0, 2), 16);
+		const c_g = parseInt(hex.substr(2, 2), 16);
+		const c_b = parseInt(hex.substr(4, 2), 16);
+		const brightness = ((c_r * 299) + (c_g * 587) + (c_b * 114)) / 1000;
+		return brightness > 155;
+	}
+
+	var bgColor = getComputedStyle(document.documentElement).getPropertyValue('--r-background-color').trim();
+	var isLight = isLight(bgColor);
+
+	if(isLight){
+		document.body.classList.add('has-light-background');
+	} else {
+		document.body.classList.add('has-dark-background');
+	}
+
+      // default options to init reveal.js
+      var defaultOptions = {
+        controls: true,
+        progress: true,
+        history: true,
+        center: true,
+        transition: 'default', // none/fade/slide/convex/concave/zoom
+        plugins: [
+          RevealMarkdown,
+          RevealHighlight,
+          RevealZoom,
+          RevealNotes,
+          RevealMath.MathJax3,
+		  RevealMermaid,
+		  RevealChart,
+		  RevealCustomControls,
+        ],
+
+
+    	allottedTime: 120 * 1000,
+
+		mathjax3: {
+			mathjax: 'plugin/math/mathjax/tex-mml-chtml.js',
+		},
+		markdown: {
+		  gfm: true,
+		  mangle: true,
+		  pedantic: false,
+		  smartLists: false,
+		  smartypants: false,
+		},
+
+		mermaid: {
+			theme: isLight ? 'default' : 'dark',
+		},
+
+		customcontrols: {
+			controls: [
+			]
+		},
+      };
+
+      // options from URL query string
+      var queryOptions = Reveal().getQueryHash() || {};
+
+      var options = extend(defaultOptions, {"width":1280,"height":720,"margin":0.15,"controls":true,"progress":true,"slideNumber":"all","transition":"slide","transitionSpeed":"default"}, queryOptions);
+    </script>
+
+    <script>
+      Reveal.initialize(options);
+    </script>
+  </body>
+
+  <!-- created with Advanced Slides -->
+</html>
