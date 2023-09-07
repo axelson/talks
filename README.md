@@ -11,4 +11,4 @@ This repository holds some of the presentations that I've given over the years.
   - [slides](https://jasonaxelson.com/talks/codebeam2022)
   - [git repo](https://github.com/axelson/vps)
 - ElixirConf 2023 - Drawing to 7-color e-ink screens with Scenic and Nerves
-  - [slides](https://jasonaxelson.com/talks/inky/#/70)
+  - [slides](https://jasonaxelson.com/talks/inky)
