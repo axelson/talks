@@ -12,3 +12,4 @@ This repository holds some of the presentations that I've given over the years.
   - [git repo](https://github.com/axelson/vps)
 - ElixirConf 2023 - Drawing to 7-color e-ink screens with Scenic and Nerves
   - [slides](https://jasonaxelson.com/talks/inky)
+  - [video](https://www.youtube.com/watch?v=Whp1Xv5Lt88&list=PLqj39LCvnOWbHaZldxw_g02RaTQ4vQ1eY&index=35)
