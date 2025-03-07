@@ -13,3 +13,5 @@ This repository holds some of the presentations that I've given over the years.
 - ElixirConf 2023 - Drawing to 7-color e-ink screens with Scenic and Nerves
   - [slides](https://jasonaxelson.com/talks/inky)
   - [video](https://www.youtube.com/watch?v=Whp1Xv5Lt88&list=PLqj39LCvnOWbHaZldxw_g02RaTQ4vQ1eY&index=35)
+- Code BEAM America 2025 - Choosing an effective testing structure
+  - [slides](<https://jasonaxelson.com/talks/codebeam2025/Choosing an effective testing structure - Code BEAM America 2025 - Jason Axelson.pdf>)
